@@ -4,50 +4,53 @@
 #include <iostream>
 #include <fstream>
 
-using namespace std;
+using std::cin;
+using std::cout;
+using std::endl;
+using std::ifstream;
+using std::ofstream;
+using std::ios;
+using std::fstream;
 
 struct employee
 {
-	int num;			// идентификационный номер сотрудника
-	char name[10];		// имя сотрудника
-	double hours;		// количество отработанных часов
+	int num;			
+	char name[10];		
+	double hours;		
 };
 
 int main()
 {
 	setlocale(LC_ALL, ".1251");
-	char namebin[80];
+	char nameBin[80];
 	char buffer[10];
 	cout << "Name of binary file: ";
-	cin >> namebin;
+	cin >> nameBin;
 	int count;
 	cout << "Count of records: ";
 	cin >> count;
 	cout << endl;
-	char commandline[100];
-	strcpy(commandline, "Creator.exe ");
-	strcat(commandline, namebin);
-	strcat(commandline, " ");
-	strcat(commandline, _itoa(count, buffer, 10));
+	char commandLine[100];
+	strcpy(commandLine, "Creator.exe ");
+	strcat(commandLine, nameBin);
+	strcat(commandLine, " ");
+	strcat(commandLine, _itoa(count, buffer, 10));
 
 	STARTUPINFO si;
 	PROCESS_INFORMATION piCom;
 	ZeroMemory(&si, sizeof(STARTUPINFO));
 	si.cb = sizeof(STARTUPINFO);
-	// создаем новый консольный процесс
-	if (!CreateProcess(NULL, (LPTSTR)commandline, NULL, NULL, FALSE,
+	if (!CreateProcess(NULL, (LPTSTR)commandLine, NULL, NULL, FALSE,
 		CREATE_NEW_CONSOLE, NULL, NULL, &si, &piCom)) {
-		cout << ":(";
-	};
-	// ждем завершения созданного прцесса
+		cout << "Creator is not created";
+	}
 	WaitForSingleObject(piCom.hProcess, INFINITE);
-	// закрываем дескрипторы этого процесса в текущем процессе
 	CloseHandle(piCom.hThread);
 	CloseHandle(piCom.hProcess);
 
-	fstream bin(namebin, ios::in);
-	int count_bin;
-	bin.read((char*)&count_bin, sizeof(int));
+	fstream bin(nameBin, ios::in);
+	int countBin;
+	bin.read((char*)&countBin, sizeof(int));
 	employee* emp = new employee[count];
 	for (int i = 0; i < count; i++)
 	{
@@ -57,38 +60,45 @@ int main()
 	bin.close();
 	cout << endl;
 
-	char nametext[80];
-	char payforhours[10];
+	char nameText[80];
+	char payForHours[10];
 	cout << "Name of report file: ";
-	cin >> nametext;
+	cin >> nameText;
 	cout << "Pay for hours: ";
-	cin >> payforhours;
+	cin >> payForHours;
 	cout << endl;
-	char commandline2[100];
-	strcpy(commandline2, "Reporter.exe ");
-	strcat(commandline2, namebin);
-	strcat(commandline2, " ");
-	strcat(commandline2, nametext);
-	strcat(commandline2, " ");
-	strcat(commandline2, payforhours);
-	CreateProcess(NULL, (LPTSTR)commandline2, NULL, NULL, FALSE,
-		CREATE_NEW_CONSOLE, NULL, NULL, &si, &piCom);
+	char commandLine2[100];
+	strcpy(commandLine2, "Reporter.exe ");
+	strcat(commandLine2, nameBin);
+	strcat(commandLine2, " ");
+	strcat(commandLine2, nameText);
+	strcat(commandLine2, " ");
+	strcat(commandLine2, payForHours);
+	if(!CreateProcess(NULL, (LPTSTR)commandLine2, NULL, NULL, FALSE,
+		CREATE_NEW_CONSOLE, NULL, NULL, &si, &piCom)){
+			cout<<"Reporter is not created";
+	}
 
-	// ждем завершения созданного прoцесса
 	WaitForSingleObject(piCom.hProcess, INFINITE);
 
-	// закрываем дескрипторы этого процесса в текущем процессе
 	CloseHandle(piCom.hThread);
 	CloseHandle(piCom.hProcess);
 
-	ifstream fin(nametext);
+	try{
+	ifstream fin("");
+	char* str = new char[100];
 	while (!fin.eof())
 	{
-		char* str = new char[100];
 		fin.getline(str, 100);
 		cout << str << endl;
 	}
 	fin.close();
+	}
+	catch(FileNotFoundException e){
+		cout << "The file was not found:" << e;
+	}
+	
+
 	system("pause");
 	return 0;
 }

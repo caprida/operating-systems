@@ -4,12 +4,17 @@ using namespace std;
 
 struct employee
 {
-	int num;			// идентификационный номер сотрудника
-	char name[10];		// имя сотрудника
-	double hours;		// количество отработанных часов
+	int num;			
+	char name[10];		
+	double hours;		
 };
+int comp(const void* comp1, const void* comp2){
+	employee* p1 = (employee*)comp1;
+	employee* p2 = (employee*)comp2;
+	return p1->num - p2->num;
+}
 
-int main(int argc, char* argv[])// 1. Имя исходного бинарного файла. 2.Имя файла отчета. 3.Оплата за час работы.
+int main(int argc, char* argv[])// 1. name of the binary file. 2.name of the report file. 3.pay for hour
 {
 	fstream fin(argv[1], ios::in);
 	ofstream fout(argv[2]);
@@ -20,11 +25,7 @@ int main(int argc, char* argv[])// 1. Имя исходного бинарного файла. 2.Имя файла
 	for (int i = 0; i < count; i++)
 		fin.read((char*)&emp[i], sizeof(employee));
 
-	qsort(emp, count, sizeof(employee), int comp(const void* comp1, const void* comp2){
-	employee* p1 = (employee*)comp1;
-	employee* p2 = (employee*)comp2;
-	return p1.num - p2.num;
-	});
+	qsort(emp, count, sizeof(employee), comp);
 	fout << "Отчет по файлу \"" << argv[1] << "\"" << endl;
 	fout << "Номер сотрудника, имя сотрудника, часы, зарплата" << endl;
 	for (int i = 0; i < count; i++)
